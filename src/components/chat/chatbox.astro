@@ -1,0 +1,126 @@
+---
+// src/components/ChatBox.astro
+---
+
+<div class="flex flex-col h-screen py-5 font-kurssiv text-lg">
+  <div
+    id="messages"
+    class="flex flex-col justify-end flex-1 overflow-y-auto gap-2 p-3 w-full min-h-0"
+  >
+    <!-- Beskeder bliver tilføjet her af scriptet -->
+  </div>
+
+  <form id="chat-form" class="flex gap-2 p-3">
+    <input
+      id="chat-input"
+      type="text"
+      placeholder="Hvordan har du det i dag?"
+      autocomplete="off"
+      class="flex-1 px-3 py-2 bg-hvid rounded-2xl disabled:opacity-60 disabled:cursor-not-allowed outline-none focus:ring-1 focus:ring-sort"
+    />
+    <button
+      type="submit"
+      class="px-4 py-2 rounded-2xl bg-gron text-white cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed border border-transparent hover:border-sort"
+    >
+      SEND
+    </button>
+  </form>
+</div>
+
+<script>
+  type Message = { role: "user" | "assistant"; text: string };
+
+  const messages: Message[] = [];
+
+  const messagesEl = document.getElementById("messages") as HTMLDivElement;
+  const formEl = document.getElementById("chat-form") as HTMLFormElement;
+  const inputEl = document.getElementById("chat-input") as HTMLInputElement;
+
+  const TYPEWRITER_SPEED_MS = 30; // hastighed af animation
+
+  const baseBubbleClasses = [
+    "max-w-[80%]",
+    "px-3",
+    "py-2",
+    "rounded-md",
+    "break-words",
+  ];
+  const userBubbleClasses = ["self-end", "bg-blaa", "text-sort"];
+  const assistantBubbleClasses = ["self-start", "bg-hvid", "text-sort"];
+
+  function renderMessage(message: Message) {
+    const bubble = document.createElement("div");
+    bubble.classList.add(...baseBubbleClasses);
+    bubble.classList.add(
+      ...(message.role === "user" ? userBubbleClasses : assistantBubbleClasses),
+    );
+    bubble.textContent = message.text;
+    messagesEl.appendChild(bubble);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function typewriterMessage(message: Message) {
+    const bubble = document.createElement("div");
+    bubble.classList.add(...baseBubbleClasses);
+    bubble.classList.add(...assistantBubbleClasses);
+    messagesEl.appendChild(bubble);
+
+    let i = 0;
+    const interval = setInterval(() => {
+      bubble.textContent += message.text[i];
+      i++;
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      if (i >= message.text.length) {
+        clearInterval(interval);
+      }
+    }, TYPEWRITER_SPEED_MS);
+  }
+
+  function setLoading(isLoading: boolean) {
+    inputEl.disabled = isLoading;
+    const button = formEl.querySelector("button") as HTMLButtonElement;
+    button.disabled = isLoading;
+    button.textContent = isLoading ? "..." : "Send";
+  }
+
+  formEl.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    const userMessage: Message = { role: "user", text };
+    messages.push(userMessage);
+    renderMessage(userMessage);
+
+    inputEl.value = "";
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Noget gik galt med kaldet til /api/chat");
+      }
+
+      const data = await response.json();
+      const assistantMessage: Message = { role: "assistant", text: data.reply };
+      messages.push(assistantMessage);
+      typewriterMessage(assistantMessage);
+    } catch (error) {
+      console.error(error);
+      renderMessage({
+        role: "assistant",
+        text: "Beklager, der opstod en fejl. Prøv igen.",
+      });
+    } finally {
+      setLoading(false);
+      inputEl.focus();
+    }
+  });
+</script>
