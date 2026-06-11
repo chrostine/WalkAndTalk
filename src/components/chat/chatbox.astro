@@ -3,28 +3,32 @@
 ---
 
 <div class="flex flex-col h-screen py-5 font-kurssiv text-lg">
-  <div
-    id="messages"
-    class="flex flex-col justify-end flex-1 overflow-y-auto gap-2 p-3 w-full min-h-0"
-  >
-    <!-- Beskeder bliver tilføjet her af scriptet -->
-  </div>
+  <div class="flex flex-col mt-auto w-full">
+    <div id="messages-wrapper" class="relative" style="height: 400px;">
+      <div
+        id="messages"
+        class="flex flex-col justify-end h-full overflow-y-scroll gap-2 p-3 w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        <!-- Beskeder bliver tilføjet her af scriptet -->
+      </div>
+    </div>
 
-  <form id="chat-form" class="flex gap-2 p-3">
-    <input
-      id="chat-input"
-      type="text"
-      placeholder="Hvordan har du det i dag?"
-      autocomplete="off"
-      class="flex-1 px-3 py-2 bg-hvid rounded-2xl disabled:opacity-60 disabled:cursor-not-allowed outline-none focus:ring-1 focus:ring-sort"
-    />
-    <button
-      type="submit"
-      class="px-4 py-2 rounded-2xl bg-gron text-white cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed border border-transparent hover:border-sort"
-    >
-      SEND
-    </button>
-  </form>
+    <form id="chat-form" class="flex gap-2 p-3">
+      <input
+        id="chat-input"
+        type="text"
+        placeholder="Hvordan har du det i dag?"
+        autocomplete="off"
+        class="flex-1 px-3 py-2 bg-hvid rounded-2xl disabled:opacity-60 disabled:cursor-not-allowed outline-none focus:ring-1 focus:ring-sort"
+      />
+      <button
+        type="submit"
+        class="px-4 py-2 rounded-2xl bg-gron text-white cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed border border-transparent hover:border-sort"
+      >
+        SEND
+      </button>
+    </form>
+  </div>
 </div>
 
 <script>
@@ -33,10 +37,17 @@
   const messages: Message[] = [];
 
   const messagesEl = document.getElementById("messages") as HTMLDivElement;
+  const wrapperEl = document.getElementById(
+    "messages-wrapper",
+  ) as HTMLDivElement;
   const formEl = document.getElementById("chat-form") as HTMLFormElement;
   const inputEl = document.getElementById("chat-input") as HTMLInputElement;
 
-  const TYPEWRITER_SPEED_MS = 30; // hastighed af animation
+  // ── Justerbare variabler ──────────────────────────
+  const TYPEWRITER_SPEED_MS = 30; // ms per bogstav
+  const FADE_THRESHOLD_PX = 200; // samlet indholdshøjde før fade aktiveres
+  const FADE_SIZE_PX = 100; // hvor mange px fade-effekten strækker sig
+  // ─────────────────────────────────────────────────
 
   const baseBubbleClasses = [
     "max-w-[80%]",
@@ -48,6 +59,18 @@
   const userBubbleClasses = ["self-end", "bg-blaa", "text-sort"];
   const assistantBubbleClasses = ["self-start", "bg-hvid", "text-sort"];
 
+  function updateFade() {
+    console.log("wrapper højde:", wrapperEl.clientHeight);
+    console.log("scroll højde:", messagesEl.scrollHeight);
+    if (messagesEl.scrollHeight > FADE_THRESHOLD_PX) {
+      wrapperEl.style.maskImage = `linear-gradient(to bottom, transparent, black ${FADE_SIZE_PX}px, black 100%)`;
+      wrapperEl.style.webkitMaskImage = `linear-gradient(to bottom, transparent, black ${FADE_SIZE_PX}px, black 100%)`;
+    } else {
+      wrapperEl.style.maskImage = "";
+      wrapperEl.style.webkitMaskImage = "";
+    }
+  }
+
   function renderMessage(message: Message) {
     const bubble = document.createElement("div");
     bubble.classList.add(...baseBubbleClasses);
@@ -57,6 +80,7 @@
     bubble.textContent = message.text;
     messagesEl.appendChild(bubble);
     messagesEl.scrollTop = messagesEl.scrollHeight;
+    updateFade();
   }
 
   function typewriterMessage(message: Message) {
@@ -70,6 +94,7 @@
       bubble.textContent += message.text[i];
       i++;
       messagesEl.scrollTop = messagesEl.scrollHeight;
+      updateFade();
 
       if (i >= message.text.length) {
         clearInterval(interval);

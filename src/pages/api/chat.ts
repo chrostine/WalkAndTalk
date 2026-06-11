@@ -36,7 +36,18 @@ export const POST: APIRoute = async ({ request }) => {
     }
   );
 
+  if (res.status === 429) {
+  return new Response(JSON.stringify({ 
+    reply: 'Jeg er lidt træt lige nu — prøv igen i morgen.' 
+  }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
   const data = await res.json();
+  // debug
+  // console.log("Gemini status:", res.status);
+  // console.log("Gemini svar:", JSON.stringify(data, null, 2));
   const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? 'Hmm, jeg kunne ikke svare.';
 
   return new Response(JSON.stringify({ reply }), {
