@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import Three from "../components/three.astro";
 ---
 
 <!doctype html>
@@ -12,7 +13,8 @@ import "../styles/global.css";
     <meta name="generator" content={Astro.generator} />
     <title>Walk and talk</title>
   </head>
-  <body class="bg-[url(/bg.png)] bg-no-repeat bg-center bg-cover">
+  <body>
+    <Three />
     <div class="mx-auto max-w-md">
       <slot />
     </div>
