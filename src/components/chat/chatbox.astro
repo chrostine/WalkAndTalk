@@ -2,7 +2,7 @@
 // src/components/ChatBox.astro
 ---
 
-<div class="flex flex-col h-screen py-5 font-kurssiv text-lg">
+<div class="flex flex-col h-screen py-5 text-lg">
   <div class="flex flex-col mt-auto w-full">
     <div id="messages-wrapper" class="relative" style="height: 400px;">
       <div
@@ -13,7 +13,7 @@
       </div>
     </div>
 
-    <form id="chat-form" class="flex gap-2 p-3">
+    <form id="chat-form" class="flex gap-2 p-3 font-kurssiv">
       <input
         id="chat-input"
         type="text"
@@ -56,8 +56,18 @@
     "rounded-md",
     "break-words",
   ];
-  const userBubbleClasses = ["self-end", "bg-gron", "text-sort"];
-  const assistantBubbleClasses = ["self-start", "bg-hvid", "text-sort"];
+  const userBubbleClasses = [
+    "self-end",
+    "bg-gron",
+    "text-sort",
+    "font-kurssiv",
+  ];
+  const assistantBubbleClasses = [
+    "self-start",
+    "bg-hvid",
+    "text-sort",
+    "font-maskine",
+  ];
 
   function updateFade() {
     console.log("wrapper højde:", wrapperEl.clientHeight);

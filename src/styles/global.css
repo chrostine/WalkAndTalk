@@ -19,6 +19,19 @@ body {
     src: url("/fonts/IndieFlower-Regular.ttf");
 }
 
+@font-face {
+    font-family: "Cutive Mono";
+    font-weight: 400;
+    font-style: normal;
+    src: url("/fonts/CutiveMono-Regular.ttf");
+}
+
+@layer base {
+    .font-maskine, [class*="font-maskine"] {
+        line-height: 1.1;
+    }
+}
+
 :root {
   --color-sort: #333534;
   --color-hvid: #FEFAF3;
@@ -26,6 +39,7 @@ body {
   --color-gron: #38B556;
   
   --font-kurssiv: "Indie Flower", cursive;
+  --font-maskine: "Cutive Mono", mono;
 }
 
 @theme {
@@ -36,4 +50,5 @@ body {
   --color-gron: var(--color-gron);
 
   --font-kurssiv: "Indie Flower", cursive;
+  --font-maskine: "Cutive Mono", mono;
 }
