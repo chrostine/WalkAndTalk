@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import Three from "../components/three.astro";
+import Video from "../components/video.astro";
 ---
 
 <!doctype html>
@@ -8,13 +8,12 @@ import Three from "../components/three.astro";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="" />
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
-    <title>Walk and talk</title>
+    <title>Space</title>
   </head>
   <body>
-    <Three />
+    <Video />
     <div class="mx-auto max-w-md">
       <slot />
     </div>

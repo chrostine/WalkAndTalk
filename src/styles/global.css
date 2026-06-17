@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 body {
-    background-color: var(--color-blaa);
+    background: transparent;
     color: var(--color-sort);
 }
 

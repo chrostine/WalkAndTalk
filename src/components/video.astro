@@ -1,0 +1,89 @@
+---
+const videos = [
+  "/video/night_slow.mp4",
+  "/video/fall_slow.mp4",
+  "/video/winter_slow.mp4",
+  "/video/summer_slow.mp4",
+];
+---
+
+<div class="fixed inset-0 -z-10 bg-black">
+  <video
+    id="vid-a"
+    autoplay
+    muted
+    playsinline
+    preload="auto"
+    class="absolute inset-0 h-full w-full object-cover opacity-100 transition-opacity duration-[5000ms] ease-in-out"
+  ></video>
+  <video
+    id="vid-b"
+    muted
+    playsinline
+    preload="auto"
+    class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-[5000ms] ease-in-out"
+  ></video>
+</div>
+
+<script define:vars={{ videos }}>
+  const els = [
+    document.getElementById("vid-a"),
+    document.getElementById("vid-b"),
+  ];
+  const FADE_DURATION = 5; // sekunder, skal matche duration-[5000ms]
+
+  let active = 0;
+  let videoIndex = 0;
+  let fading = false;
+
+  function setSrc(el, src) {
+    el.src = src;
+    el.load();
+  }
+
+  // Start: el 0 spiller video 0, el 1 preloader video 1 i baggrunden
+  els[0].style.zIndex = "1";
+  els[1].style.zIndex = "1";
+  setSrc(els[0], videos[0]);
+  els[0].play().catch(() => {});
+  setSrc(els[1], videos[(videoIndex + 1) % videos.length]);
+
+  function startFade() {
+    fading = true;
+    const next = 1 - active;
+
+    // Læg den indkommende video ØVERST, så den fader ind oven på den aktive
+    els[active].style.zIndex = "1";
+    els[next].style.zIndex = "2";
+
+    els[next].currentTime = 0;
+    els[next].play().catch(() => {});
+
+    // Kun den nye fader ind. Den gamle bliver liggende på fuld opacity nedenunder.
+    els[next].classList.replace("opacity-0", "opacity-100");
+
+    setTimeout(() => {
+      els[active].pause();
+      // Skjul den gamle (den er nu helt dækket, så det ses ikke)
+      els[active].classList.replace("opacity-100", "opacity-0");
+
+      active = next;
+      fading = false;
+
+      videoIndex = (videoIndex + 1) % videos.length;
+      const preloadIndex = (videoIndex + 1) % videos.length;
+      setSrc(els[1 - active], videos[preloadIndex]);
+    }, FADE_DURATION * 1000);
+  }
+
+  function checkFade(e) {
+    const el = e.target;
+    if (el !== els[active] || fading) return;
+    if (el.duration && el.duration - el.currentTime <= FADE_DURATION) {
+      startFade();
+    }
+  }
+
+  els[0].addEventListener("timeupdate", checkFade);
+  els[1].addEventListener("timeupdate", checkFade);
+</script>

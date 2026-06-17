@@ -1,8 +1,16 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Chatbox from "../components/chat/chatbox.astro";
+import Chatbox from "../components/chatbox.astro";
+import Logo from "../components/logo.astro";
 ---
 
 <Layout>
-  <Chatbox />
+  <div class="flex h-screen flex-col">
+    <div class="flex justify-center">
+      <Logo />
+    </div>
+    <div class="min-h-0 flex-1">
+      <Chatbox />
+    </div>
+  </div>
 </Layout>
